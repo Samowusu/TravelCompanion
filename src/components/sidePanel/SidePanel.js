@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, createRef } from "react";
 import {
   CircularProgress,
   Grid,
@@ -12,28 +12,32 @@ import {
 import useStyles from "./styles";
 import PlaceDetails from "../placeDetails/PlaceDetails";
 
-function SidePanel() {
-  const [typeState, setTypeState] = useState("restaurants");
-  const [ratingState, setRatingState] = useState("");
+function SidePanel({
+  places,
+  childClicked,
+  isLoading,
+  type,
+  setType,
+  rating,
+  setRating,
+}) {
+  const [placesRefsState, setPlacesRefsState] = useState([]);
+
+  useEffect(() => {
+    const refs = Array(places?.length)
+      .fill()
+      .map((_, index) => placesRefsState[index] || createRef());
+    setPlacesRefsState(refs);
+  }, [places]);
+
   const classes = useStyles();
 
-  const places = [
-    { name: "cool place" },
-    { name: "best beer" },
-    { name: "best steak" },
-    { name: "best softdrinks" },
-    { name: "best food" },
-    { name: "best alcohol" },
-    { name: "best decor" },
-    { name: "best music" },
-    { name: "best furniture" },
-  ];
   const typeChangeHandler = (event) => {
-    setTypeState(event.target.value);
+    setType(event.target.value);
   };
 
   const ratingChangeHandler = (event) => {
-    setRatingState(event.target.value);
+    setRating(event.target.value);
   };
 
   return (
@@ -41,31 +45,43 @@ function SidePanel() {
       <Typography variant="h4">
         Restaurants, Hotels & Atrractions around you
       </Typography>
-      <FormControl className={classes.formControl}>
-        <InputLabel>Type</InputLabel>
-        <Select value={typeState} onChange={typeChangeHandler}>
-          <MenuItem value="restaurants">Restaurants</MenuItem>
-          <MenuItem value="hotels">Hotels</MenuItem>
-          <MenuItem value="attractions">Attractions</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl className={classes.formControl}>
-        <InputLabel>Rating</InputLabel>
-        <Select value={ratingState} onChange={ratingChangeHandler}>
-          <MenuItem value={0}>All</MenuItem>
-          <MenuItem value={3}>Above 3</MenuItem>
-          <MenuItem value={4}>Above 4</MenuItem>
-          <MenuItem value={4.5}>Above 4.5</MenuItem>
-        </Select>
-      </FormControl>
-      <Grid container spacing={3} className={classes.list}>
-        {places &&
-          places.map((place, index) => (
-            <Grid item key={index} xs={12}>
-              <PlaceDetails place={place} />
-            </Grid>
-          ))}
-      </Grid>
+      {isLoading ? (
+        <div className={classes.loading}>
+          <CircularProgress size={"5rem"} />
+        </div>
+      ) : (
+        <>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Type</InputLabel>
+            <Select value={type} onChange={typeChangeHandler}>
+              <MenuItem value="restaurants">Restaurants</MenuItem>
+              <MenuItem value="hotels">Hotels</MenuItem>
+              <MenuItem value="attractions">Attractions</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Rating</InputLabel>
+            <Select value={rating} onChange={ratingChangeHandler}>
+              <MenuItem value={0}>All</MenuItem>
+              <MenuItem value={3}>Above 3</MenuItem>
+              <MenuItem value={4}>Above 4</MenuItem>
+              <MenuItem value={4.5}>Above 4.5</MenuItem>
+            </Select>
+          </FormControl>
+          <Grid container spacing={3} className={classes.list}>
+            {places &&
+              places.map((place, index) => (
+                <Grid item key={index} xs={12}>
+                  <PlaceDetails
+                    place={place}
+                    selected={Number(childClicked) === index}
+                    refProps={placesRefsState[index]}
+                  />
+                </Grid>
+              ))}
+          </Grid>
+        </>
+      )}
     </div>
   );
 }
