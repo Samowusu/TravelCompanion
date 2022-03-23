@@ -22,6 +22,7 @@ function SidePanel({
   setRating,
 }) {
   const [placesRefsState, setPlacesRefsState] = useState([]);
+  const havePlaces = places.length;
 
   useEffect(() => {
     const refs = Array(places?.length)
@@ -68,18 +69,22 @@ function SidePanel({
               <MenuItem value={4.5}>Above 4.5</MenuItem>
             </Select>
           </FormControl>
-          <Grid container spacing={3} className={classes.list}>
-            {places &&
-              places.map((place, index) => (
-                <Grid item key={index} xs={12}>
-                  <PlaceDetails
-                    place={place}
-                    selected={Number(childClicked) === index}
-                    refProps={placesRefsState[index]}
-                  />
-                </Grid>
-              ))}
-          </Grid>
+          {havePlaces ? (
+            <Grid container spacing={3} className={classes.list}>
+              {places &&
+                places.map((place, index) => (
+                  <Grid item key={index} xs={12} ref={placesRefsState[index]}>
+                    <PlaceDetails
+                      place={place}
+                      selected={Number(childClicked) === index}
+                      refProps={placesRefsState[index]}
+                    />
+                  </Grid>
+                ))}
+            </Grid>
+          ) : (
+            <Typography variant="h5">Found no {type}</Typography>
+          )}
         </>
       )}
     </div>
