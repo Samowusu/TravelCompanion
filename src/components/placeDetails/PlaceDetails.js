@@ -49,9 +49,13 @@ function PlaceDetails({ place, selected, refProps }) {
             {place.price_level}
           </Typography>
         </Box>
-        <Box display={"flex"} justifyContent="space-between">
-          <Typography variant="subtitle1">Ranking</Typography>
-          <Typography gutterBottom variant="subtitle1">
+        <Box display={"flex"} justifyContent="flex-start">
+          <Typography variant="subtitle1">Ranking </Typography>
+          <Typography
+            gutterBottom
+            variant="subtitle1"
+            style={{ textAlign: "start" }}
+          >
             {place.ranking}
           </Typography>
         </Box>

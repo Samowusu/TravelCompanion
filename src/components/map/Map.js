@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import GoogleMapReact from "google-map-react";
 import { Paper, Typography, useMediaQuery } from "@material-ui/core";
 import LocationOnOutlined from "@material-ui/icons/LocationOnOutlined";
@@ -15,6 +15,15 @@ function Map({
   setChildClicked,
   weatherData,
 }) {
+  const [defaultCenterState, setDefaultCenterState] = useState({});
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      ({ coord: { latitude, longitude } }) =>
+        setDefaultCenterState({ lat: latitude, lng: longitude })
+    );
+  }, []);
+
   const classes = useStyles();
   const isMobile = useMediaQuery("(max-width: 600px)");
 
@@ -27,7 +36,7 @@ function Map({
     <div className={classes.mapContainer}>
       <GoogleMapReact
         bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY }}
-        defaultCenter={coordinates}
+        defaultCenter={defaultCenterState}
         center={coordinates}
         defaultZoom={14}
         margin={[50, 50, 50, 50]}
@@ -39,7 +48,6 @@ function Map({
         onChange={changeMapCoordinatesHandler}
         onChildClick={(child) => {
           setChildClicked(child);
-          console.log("child is clicked");
         }}
       >
         {places &&
@@ -55,7 +63,9 @@ function Map({
               ) : (
                 <Paper elevation={3} className={classes.paper}>
                   <Typography gutterBottom variant="subtitle2">
-                    {place.name}
+                    {place?.name?.length > 10
+                      ? `${place?.name?.substring(0, 10)}...`
+                      : place?.name}
                   </Typography>
                   <img
                     src={
@@ -66,7 +76,7 @@ function Map({
                     className={classes.pointer}
                     alt={place.name}
                   />
-                  <Rating size="small" value={Number(place.rating)} readOnly />
+                  {/* <Rating size="small" value={Number(place.rating)} readOnly /> */}
                 </Paper>
               )}
             </div>
